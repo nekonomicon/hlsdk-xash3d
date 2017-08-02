@@ -77,24 +77,11 @@ public:
 	void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType);
 	void Killed(entvars_t *pevAttacker, int iGib);
 
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
-	static	TYPEDESCRIPTION m_SaveData[];
-
-	BOOL	m_fSuspicious;
 	int		head;
 	int		bodystate;
 };
 
 LINK_ENTITY_TO_CLASS(monster_otis, COtis);
-
-TYPEDESCRIPTION	COtis::m_SaveData[] =
-{
-	DEFINE_FIELD(COtis, m_fSuspicious, FIELD_INTEGER),
-	DEFINE_FIELD(COtis, head, FIELD_INTEGER),
-};
-
-IMPLEMENT_SAVERESTORE(COtis, CTalkMonster);
 
 //=========================================================
 // ALertSound - otis says "Freeze!"
