@@ -65,7 +65,7 @@ TYPEDESCRIPTION	CShock::m_SaveData[] =
 	DEFINE_FIELD(CShock, m_pSprite, FIELD_CLASSPTR),
 };
 
-IMPLEMENT_SAVERESTORE(CShock, CBaseEntity)
+IMPLEMENT_SAVERESTORE(CShock, CBaseAnimating)
 
 void CShock::Spawn(void)
 {
@@ -75,8 +75,6 @@ void CShock::Spawn(void)
 	pev->classname = MAKE_STRING("shock_beam");
 	SET_MODEL(ENT(pev), "models/shock_effect.mdl");
 	UTIL_SetOrigin(pev, pev->origin);
-	pev->frame = 0;
-	pev->scale = 0.4;
 
 	if ( g_pGameRules->IsMultiplayer() )
 		pev->dmg = gSkillData.plrDmgShockroachMultiplayer;
