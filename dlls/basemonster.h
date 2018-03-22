@@ -327,6 +327,24 @@ public:
 	BOOL ExitScriptedSequence();
 	BOOL CineCleanup();
 
-	CBaseEntity* DropItem( const char *pszItemName, const Vector &vecPos, const Vector &vecAng );// drop an item.
+	CBaseEntity* DropItem ( const char *pszItemName, const Vector &vecPos, const Vector &vecAng );// drop an item.
+
+	//
+	// Glowshell effects
+	//
+	void GlowShellOn( Vector color, float flDuration );
+
+	void GlowShellOff( void );
+	void GlowShellUpdate( void );
+
+	float m_glowShellTime;
+	float m_glowShellDuration;
+	Vector m_glowShellColor;
+	BOOL m_glowShellUpdate;
+
+	Vector m_prevRenderColor;
+	int m_prevRenderFx;
+	int m_prevRenderMode;
+	int m_prevRenderAmt;
 };
 #endif // BASEMONSTER_H

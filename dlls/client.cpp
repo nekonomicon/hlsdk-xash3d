@@ -45,6 +45,8 @@ extern DLL_GLOBAL BOOL		g_fGameOver;
 extern DLL_GLOBAL int		g_iSkillLevel;
 extern DLL_GLOBAL ULONG		g_ulFrameCount;
 
+char *GetTeamName( int team );
+
 extern void CopyToBodyQue( entvars_t* pev );
 extern int giPrecacheGrunt;
 extern int gmsgSayText;
@@ -108,7 +110,7 @@ void ClientDisconnect( edict_t *pEntity )
 
 	char text[256] = "";
 	if( pEntity->v.netname )
-		snprintf( text, sizeof(text), "- %s has left the game\n", STRING( pEntity->v.netname ) );
+		_snprintf( text, sizeof(text), "- %s has left the game\n", STRING( pEntity->v.netname ) );
 	MESSAGE_BEGIN( MSG_ALL, gmsgSayText, NULL );
 		WRITE_BYTE( ENTINDEX( pEntity ) );
 		WRITE_STRING( text );
@@ -660,7 +662,7 @@ void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
 		if( gpGlobals->maxClients > 1 )
 		{
 			char text[256];
-			snprintf( text, 256, "* %s changed name to %s\n", STRING( pEntity->v.netname ), g_engfuncs.pfnInfoKeyValue( infobuffer, "name" ) );
+			_snprintf( text, 256, "* %s changed name to %s\n", STRING( pEntity->v.netname ), g_engfuncs.pfnInfoKeyValue( infobuffer, "name" ) );
 			MESSAGE_BEGIN( MSG_ALL, gmsgSayText, NULL );
 				WRITE_BYTE( ENTINDEX( pEntity ) );
 				WRITE_STRING( text );
@@ -929,6 +931,31 @@ void ClientPrecache( void )
 
 	if( giPrecacheGrunt )
 		UTIL_PrecacheOther( "monster_human_grunt" );
+
+	// Teleport sounds. Used by trigger_xen_return
+	PRECACHE_SOUND( "debris/beamstart7.wav" );
+
+	PRECACHE_MODEL( "models/flag.mdl" );
+	PRECACHE_MODEL( "models/civ_stand.mdl" );
+	PRECACHE_MODEL( "models/mil_stand.mdl" );
+
+	PRECACHE_MODEL( "models/w_accelerator.mdl" );
+	PRECACHE_MODEL( "models/w_backpack.mdl" );
+	PRECACHE_MODEL( "models/w_fgrenade.mdl" );
+	PRECACHE_MODEL( "models/w_health.mdl" );
+	PRECACHE_MODEL( "models/w_icon.mdl" );
+	PRECACHE_MODEL( "models/w_jumppack.mdl" );
+	PRECACHE_MODEL( "models/w_porthev.mdl" );
+
+	PRECACHE_SOUND( "ctf/bm_flagtaken.wav" );
+	PRECACHE_SOUND( "ctf/civ_flag_capture.wav" );
+	PRECACHE_SOUND( "ctf/itemthrow.wav" );
+	PRECACHE_SOUND( "ctf/marine_flag_capture.wav" );
+	PRECACHE_SOUND( "ctf/pow_armor_charge.wav" );
+	PRECACHE_SOUND( "ctf/pow_backpack.wav" );
+	PRECACHE_SOUND( "ctf/pow_big_jump.wav" );
+	PRECACHE_SOUND( "ctf/pow_health_charge.wav" );
+	PRECACHE_SOUND( "ctf/soldier_flagtaken.wav" );
 }
 
 /*
@@ -1786,6 +1813,22 @@ void UpdateClientData( const struct edict_s *ent, int sendweapons, struct client
 					{
 						cd->vuser2.y = ( (CRpg *)pl->m_pActiveItem )->m_fSpotActive;
 						cd->vuser2.z = ( (CRpg *)pl->m_pActiveItem )->m_cActiveRockets;
+					}
+					else if( pl->m_pActiveItem->m_iId == WEAPON_M249 )
+					{
+						cd->vuser2.y = pl->ammo_556;
+					}
+					else if( pl->m_pActiveItem->m_iId == WEAPON_SHOCKRIFLE )
+					{
+						cd->vuser2.y = pl->ammo_shocks;
+					}
+					else if( pl->m_pActiveItem->m_iId == WEAPON_SNIPERRIFLE )
+					{
+						cd->vuser2.y = pl->ammo_762;
+					}
+					else if( pl->m_pActiveItem->m_iId == WEAPON_SPORELAUNCHER )
+					{
+						cd->vuser2.y = pl->ammo_spores;
 					}
 				}
 			}

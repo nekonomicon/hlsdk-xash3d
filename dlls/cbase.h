@@ -104,6 +104,7 @@ typedef void(CBaseEntity::*USEPTR)( CBaseEntity *pActivator, CBaseEntity *pCalle
 #define CLASS_PLAYER_ALLY		11
 #define CLASS_PLAYER_BIOWEAPON		12 // hornets and snarks.launched by players
 #define CLASS_ALIEN_BIOWEAPON		13 // hornets and snarks.launched by the alien menace
+#define CLASS_RACEX_PREDATOR		14
 #define	CLASS_BARNACLE			99 // special because no one pays attention to it, and it eats a wide cross-section of creatures.
 
 class CBaseEntity;
@@ -233,6 +234,27 @@ public:
 #endif
 
 	virtual void UpdateOnRemove( void );
+	//=====================================================
+	// Use these functions to perform additional cleaning.
+	//=====================================================
+
+	// Called before entity removal.
+	virtual void PreRemoval( void )
+	{
+		return;
+	}
+
+	// Called during removal.
+	virtual void OnRemove( void )
+	{
+		return;
+	}
+
+	// Called after entity removal.
+	virtual void PostRemoval( void )
+	{
+		return;
+	}
 
 	// common member functions
 	void EXPORT SUB_Remove( void );
@@ -283,7 +305,7 @@ public:
 #ifdef _DEBUG
 	void FunctionCheck( void *pFunction, char *name ) 
 	{ 
-		if( pFunction && !NAME_FOR_FUNCTION( (size_t)( pFunction ) ) )
+		if( pFunction && !NAME_FOR_FUNCTION( pFunction ) )
 			ALERT( at_error, "No EXPORT: %s:%s (%08lx)\n", STRING( pev->classname ), name, (size_t)pFunction );
 	}
 
@@ -343,6 +365,10 @@ public:
 	int ammo_uranium;
 	int ammo_hornets;
 	int ammo_argrens;
+	int ammo_556;
+	int ammo_762;
+	int ammo_shocks;
+	int ammo_spores;
 	//Special stuff for grenades and satchels.
 	float m_flStartThrow;
 	float m_flReleaseThrow;
@@ -671,7 +697,7 @@ public:
 	void RotSpawn( void );
 	virtual void KeyValue( KeyValueData* pkvd);
 
-	void ButtonActivate();
+	virtual void ButtonActivate();
 	void SparkSoundCache( void );
 
 	void EXPORT ButtonShot( void );

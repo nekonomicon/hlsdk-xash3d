@@ -99,7 +99,6 @@ void CBaseMonster::RunAI( void )
 
 		CheckAmmo();
 	}
-
 	FCheckAITrigger();
 
 	PrescheduleThink();

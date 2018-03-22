@@ -180,6 +180,15 @@ void CGib::SpawnHeadGib( entvars_t *pevVictim )
 
 void CGib::SpawnRandomGibs( entvars_t *pevVictim, int cGibs, int human )
 {
+	if (human) {
+		SpawnRandomGibs( pevVictim, cGibs, "models/hgibs.mdl", HUMAN_GIB_COUNT, 1 ); // start at one to avoid throwing random amounts of skulls (0th gib)
+	} else {
+		SpawnRandomGibs( pevVictim, cGibs, "models/agibs.mdl", ALIEN_GIB_COUNT );
+	}
+}
+
+void CGib::SpawnRandomGibs(entvars_t *pevVictim, int cGibs, const char* gibModel, int gibBodiesNum , int startGibNum)
+{
 	int cSplat;
 
 	for( cSplat = 0; cSplat < cGibs; cSplat++ )
@@ -189,22 +198,12 @@ void CGib::SpawnRandomGibs( entvars_t *pevVictim, int cGibs, int human )
 		if( g_Language == LANGUAGE_GERMAN )
 		{
 			pGib->Spawn( "models/germangibs.mdl" );
-			pGib->pev->body = RANDOM_LONG( 0, GERMAN_GIB_COUNT - 1 );
+			pGib->pev->body = RANDOM_LONG( startGibNum, GERMAN_GIB_COUNT - 1 );
 		}
 		else
 		{
-			if( human )
-			{
-				// human pieces
-				pGib->Spawn( "models/hgibs.mdl" );
-				pGib->pev->body = RANDOM_LONG( 1, HUMAN_GIB_COUNT - 1 );// start at one to avoid throwing random amounts of skulls (0th gib)
-			}
-			else
-			{
-				// aliens
-				pGib->Spawn( "models/agibs.mdl" );
-				pGib->pev->body = RANDOM_LONG( 0, ALIEN_GIB_COUNT - 1 );
-			}
+			pGib->Spawn( gibModel );
+			pGib->pev->body = RANDOM_LONG( startGibNum, gibBodiesNum - 1 );
 		}
 
 		if( pevVictim )
@@ -911,6 +910,11 @@ int CBaseMonster::TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, f
 		return 0;
 	}
 
+	if( ( bitsDamageType & DMG_ENERGYBEAM ) && FClassnameIs( pevAttacker, "shock_beam" ) )
+	{
+		GlowShellOn( Vector( 0, 220, 255 ), .5f );
+	}
+
 	// react to the damage (get mad)
 	if( ( pev->flags & FL_MONSTER ) && !FNullEnt( pevAttacker ) )
 	{
@@ -982,7 +986,7 @@ int CBaseMonster::DeadTakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacke
 	}
 #endif
 	// kill the corpse if enough damage was done to destroy the corpse and the damage is of a type that is allowed to destroy the corpse.
-	if( bitsDamageType & DMG_GIB_CORPSE )
+	if( (bitsDamageType & DMG_GIB_CORPSE) || (( bitsDamageType & DMG_ENERGYBEAM ) && FClassnameIs( pevInflictor, "shock_beam" )) )
 	{
 		if( pev->health <= flDamage )
 		{
@@ -1402,6 +1406,9 @@ void CBaseEntity::FireBullets( ULONG cShots, Vector vecSrc, Vector vecDirShootin
 			case BULLET_MONSTER_MP5:
 			case BULLET_MONSTER_9MM:
 			case BULLET_MONSTER_12MM:
+			case BULLET_MONSTER_357:
+			case BULLET_MONSTER_556:
+			case BULLET_MONSTER_762:
 			default:
 				MESSAGE_BEGIN( MSG_PAS, SVC_TEMPENTITY, vecTracerSrc );
 					WRITE_BYTE( TE_TRACER );
@@ -1449,6 +1456,21 @@ void CBaseEntity::FireBullets( ULONG cShots, Vector vecSrc, Vector vecDirShootin
 					TEXTURETYPE_PlaySound( &tr, vecSrc, vecEnd, iBulletType );
 					DecalGunshot( &tr, iBulletType );
 				}
+				break;
+			case BULLET_MONSTER_357:
+				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET );
+				TEXTURETYPE_PlaySound( &tr, vecSrc, vecEnd, iBulletType );
+				DecalGunshot( &tr, iBulletType );
+				break;
+			case BULLET_MONSTER_556:
+				pEntity->TraceAttack( pevAttacker, gSkillData.monDmg556, vecDir, &tr, DMG_BULLET );
+				TEXTURETYPE_PlaySound( &tr, vecSrc, vecEnd, iBulletType );
+				DecalGunshot( &tr, iBulletType );
+				break;
+			case BULLET_MONSTER_762:
+				pEntity->TraceAttack( pevAttacker, gSkillData.monDmg762, vecDir, &tr, DMG_BULLET );
+				TEXTURETYPE_PlaySound( &tr, vecSrc, vecEnd, iBulletType );
+				DecalGunshot( &tr, iBulletType );
 				break;
 			case BULLET_NONE: // FIX
 				pEntity->TraceAttack( pevAttacker, 50, vecDir, &tr, DMG_CLUB );
@@ -1535,6 +1557,12 @@ Vector CBaseEntity::FireBulletsPlayer( ULONG cShots, Vector vecSrc, Vector vecDi
 				break;
 			case BULLET_PLAYER_357:
 				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET );
+				break;
+			case BULLET_PLAYER_556:
+				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmg556, vecDir, &tr, DMG_BULLET );
+				break;
+			case BULLET_PLAYER_762:
+				pEntity->TraceAttack( pevAttacker, gSkillData.plrDmg762, vecDir, &tr, DMG_BULLET );
 				break;
 			case BULLET_NONE: // FIX
 				pEntity->TraceAttack( pevAttacker, 50, vecDir, &tr, DMG_CLUB );

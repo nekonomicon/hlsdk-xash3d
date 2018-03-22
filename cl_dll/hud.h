@@ -22,7 +22,7 @@
 #pragma once
 #ifndef HUD_H
 #define HUD_H
-#define RGB_YELLOWISH 0x00FFA000 //255,160,0
+#define RGB_YELLOWISH 0x0000A000 //0,160,0
 #define RGB_REDISH 0x00FF1010 //255,160,0
 #define RGB_GREENISH 0x0000A000 //0,160,0
 
@@ -427,6 +427,27 @@ private:
 //
 //-----------------------------------------------------
 //
+class CHudNightvision : public CHudBase
+{
+public:
+	int Init( void );
+	int VidInit( void );
+	int Draw( float flTime );
+	void Reset( void );
+	int MsgFunc_Nightvision( const char *pszName, int iSize, void *pbuf );
+	int MsgFunc_Flashlight( const char *pszName, int iSize, void *pbuf );
+
+private:
+	HSPRITE m_hSprite1, m_hSprite2, m_hSprite3, m_hSprite4;
+
+	wrect_t *m_prc;
+	int m_fOn;
+	int m_iFrame, m_nFrameCount;
+};
+
+//
+//-----------------------------------------------------
+//
 class CHudFlashlight: public CHudBase
 {
 public:
@@ -633,6 +654,7 @@ public:
 	CHudAmmoSecondary	m_AmmoSecondary;
 	CHudTextMessage m_TextMessage;
 	CHudStatusIcons m_StatusIcons;
+	CHudNightvision m_Nightvision;
 	CHudScoreboard	m_Scoreboard;
 	CHudMOTD	m_MOTD;
 
